@@ -12,8 +12,37 @@ class BasePokerPlayer(object):
   - receive_round_result_message
   """
 
-  def __init__(self):
+  def __init__(self,table, name):
+    self.table = table
+    self.name = name
     pass
+
+  # 定义辅助函数用于转换牌面字符串中的花色字母为对应的符号
+  @staticmethod
+  def convert_card(card):
+    """
+    将牌字符串中的花色字母转换为对应的花色符号。
+
+    参数:
+        card (str): 牌的表示，例如 "SA" 表示黑桃 A，"DT" 表示方片 T。
+
+    返回:
+        str: 转换后的牌表示，例如 "♠A" 或 "♦T"。
+    """
+    # 定义花色字母到符号的映射字典
+    suit_map = {
+      "S": "♠",  # Spades 黑桃
+      "H": "♥",  # Hearts 红心
+      "D": "♦",  # Diamonds 方片
+      "C": "♣"  # Clubs 梅花（草花）
+    }
+    # 获取牌面中第一位作为花色，后面的部分作为牌面数字/字母
+
+    suit = card[0]
+    rank = card[1:]
+    card= suit_map.get(card[0]) + card[1:]
+    # 返回对应花色符号和牌面数字的组合，若花色不存在则直接返回原字符
+    return card
 
   def declare_action(self, valid_actions, hole_card, round_state):
     err_msg = self.__build_err_msg("declare_action")
