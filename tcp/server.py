@@ -1,8 +1,6 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, send,emit
 
-from main import start_game
-
 app = Flask(__name__)
 # 创建 SocketIO 对象，默认为异步模式
 socketio = SocketIO(app)
@@ -28,17 +26,20 @@ def handle_login(data):
     else:
         send("换个名字", room=sid)
     # 如果达到3个客户端且未开始，则广播开始消息
-    if len(user_sid_map) >= game_config['player_number']:
+    if len(user_sid_map) >= game_config['player_amount']:
+        game_config['username'] = list(user_sid_map.keys())
         start_game(game_config)
 
 @socketio.on('message')
 def handle_message(msg):
     print("收到消息：", msg)
 
+@socketio.on("ask_action")
 def ask_action(name,valid_actions):
     return emit("action", valid_actions, room=user_sid_map[name])
 
 if __name__ == '__main__':
-    game_config={"max_round":10, "initial_stack":100, "small_blind_amount":0.5,"player_number":2}
+    from start import start_game
+    game_config={"max_round":10, "initial_stack":100, "small_blind_amount":0.5,"player_amount":2}
     # 监听所有网络接口上的5000端口
     socketio.run(app, host='0.0.0.0', port=5000)
