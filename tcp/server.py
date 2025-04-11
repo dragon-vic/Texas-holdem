@@ -17,6 +17,7 @@ def handle_login(data):
     """
     客户端登录时需要发送username
     """
+    print("11111",socketio)
     username = data
     sid = request.sid
     if username and username not in user_sid_map:
@@ -28,18 +29,18 @@ def handle_login(data):
     # 如果达到3个客户端且未开始，则广播开始消息
     if len(user_sid_map) >= game_config['player_amount']:
         game_config['username'] = list(user_sid_map.keys())
+        game_config['user_sid_map'] = user_sid_map
+        game_config["socketio"] = socketio
+        from start import start_game
         start_game(game_config)
 
 @socketio.on('message')
 def handle_message(msg):
     print("收到消息：", msg)
 
-@socketio.on("ask_action")
-def ask_action(name,valid_actions):
-    return emit("action", valid_actions, room=user_sid_map[name])
 
 if __name__ == '__main__':
-    from start import start_game
+
     game_config={"max_round":10, "initial_stack":100, "small_blind_amount":0.5,"player_amount":2}
     # 监听所有网络接口上的5000端口
     socketio.run(app, host='0.0.0.0', port=5000)

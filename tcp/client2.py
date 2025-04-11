@@ -17,7 +17,7 @@ sio = socketio.Client()
 
 @sio.event
 def connect():
-    sio.emit("login", input("登录成功，注册用户名："))
+    sio.emit("login", 2)
 
 @sio.event
 def message(data):
@@ -33,6 +33,7 @@ def reconnect():
 
 @sio.event
 def action(valid_actions):
+    print("需要操作")
     for idx, action_info in enumerate(valid_actions):
         action = action_info['action']
         if action == "raise":
@@ -66,6 +67,7 @@ def action(valid_actions):
                     print("下注金额不在允许范围内，请重新输入。")
             except ValueError:
                 print("输入无效，请输入数字。")
+    print("输入成功")
     return action_name, amount
 
 

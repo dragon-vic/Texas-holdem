@@ -1,6 +1,6 @@
 
 from pypokerengine.players import BasePokerPlayer
-from tcp.server import ask_action
+
 
 
 # ------------------------------------------------------------------------------
@@ -138,7 +138,8 @@ class HumanPlayer(BasePokerPlayer):
 class ServerPlayer(BasePokerPlayer):
 
     def declare_action(self, valid_actions, hole_card, round_state):
-        return ask_action(self.name,valid_actions)
+        action, amount = self.socketio.call("action", valid_actions, room=self.sid)
+        return action, amount
 
     def receive_game_start_message(self, game_info):
         pass
