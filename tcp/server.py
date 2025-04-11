@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-使用 Flask-SocketIO 构建简单聊天室
-当客户端连接后，可以发送消息，服务器会将消息广播给所有连接的客户端
-"""
-
 from flask import Flask, request
 from flask_socketio import SocketIO, send,emit
 
@@ -40,11 +34,11 @@ def handle_login(data):
 @socketio.on('message')
 def handle_message(msg):
     print("收到消息：", msg)
-    # 将客户端发送的消息广播给所有客户端
-    send(msg, broadcast=True)
+
+def ask_action(name,valid_actions):
+    return emit("action", valid_actions, room=user_sid_map[name])
 
 if __name__ == '__main__':
-
-    game_config={"max_round":10, "initial_stack":100, "small_blind_amount":0.5,"player_number":3}
+    game_config={"max_round":10, "initial_stack":100, "small_blind_amount":0.5,"player_number":2}
     # 监听所有网络接口上的5000端口
     socketio.run(app, host='0.0.0.0', port=5000)

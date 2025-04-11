@@ -1,7 +1,7 @@
 from pypokerengine.engine.dealer import Dealer
 from pypokerengine.players import BasePokerPlayer
 
-def setup_config(max_round, initial_stack, small_blind_amount, ante=0):
+def setup_config(max_round, initial_stack, small_blind_amount, ante=0,**kwargs):
     return Config(max_round, initial_stack, small_blind_amount, ante)
 
 def start_poker(config, verbose=2):

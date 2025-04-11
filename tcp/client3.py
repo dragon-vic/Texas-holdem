@@ -5,6 +5,8 @@
 import time
 import socketio
 
+from pypokerengine.api.game import setup_config
+
 # 修改为你服务端的实际 IP 和端口，例如公网 IP '189.1.222.66'
 SERVER_IP = '189.1.222.66'
 SERVER_PORT = 5000
@@ -15,15 +17,11 @@ sio = socketio.Client()
 
 @sio.event
 def connect():
-    print("成功连接服务器")
+    sio.emit("login", input("登录成功，注册用户名："))
 
 @sio.event
 def message(data):
-
     print("收到消息：", data)
-
-
-    sio.send(input("发送:"))
 
 @sio.event
 def disconnect():
@@ -34,19 +32,19 @@ def reconnect():
     print("成功重新连接到服务器")
 
 @sio.event
-def disconnect():
-    print("断开连接")
+def action():
+    print("到你行动了")
 
-@sio.event
-def start_poker():
-    print("开始游戏了！")
-    # 这里可以添加游戏开始后的逻辑，例如发牌等
-    # sio.send("开始游戏")
 
-if __name__ == '__main__':
-    # 尝试连接服务器
+
+def main():
     sio.connect(SERVER_URL)
 
     sio.wait()
 
     sio.disconnect()
+
+
+if __name__ == '__main__':
+    # 尝试连接服务器
+    main()

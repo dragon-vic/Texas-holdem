@@ -32,8 +32,41 @@ def reconnect():
     print("成功重新连接到服务器")
 
 @sio.event
-def action():
-    print("到你行动了")
+def action(valid_actions):
+    for idx, action_info in enumerate(valid_actions):
+        action = action_info['action']
+        if action == "raise":
+            amount_info = action_info.get('amount', {})
+            print(f"  [{idx}] {action} (下注金额范围: {amount_info.get('min')} - {amount_info.get('max')})")
+        else:
+            print(f"  [{idx}] {action}, 下注金额: {action_info['amount']}")
+    # 循环等待玩家输入有效选项
+    while True:
+        try:
+            choice = int(input("请输入操作对应的序号: "))
+            if 0 <= choice < len(valid_actions):
+                chosen_action = valid_actions[choice]
+                break
+            else:
+                print("输入错误，请输入有效序号。")
+        except ValueError:
+            print("输入无效，请输入数字。")
+    action_name = chosen_action['action']
+    amount = chosen_action['amount']
+    # 如果选择了加注，提示输入下注金额，并验证范围
+    if action_name == "raise":
+        min_amount = chosen_action['amount']['min']
+        max_amount = chosen_action['amount']['max']
+        while True:
+            try:
+                amount = int(input(f"请输入下注金额（范围 {min_amount} ~ {max_amount}): "))
+                if min_amount <= amount <= max_amount:
+                    break
+                else:
+                    print("下注金额不在允许范围内，请重新输入。")
+            except ValueError:
+                print("输入无效，请输入数字。")
+    return action_name, amount
 
 
 

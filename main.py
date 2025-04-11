@@ -2,7 +2,7 @@ import math
 import random
 from pypokerengine.api.game import setup_config, start_poker
 from pypokerengine.players import BasePokerPlayer
-
+from tcp.server import ask_action
 
 
 # ------------------------------------------------------------------------------
@@ -137,11 +137,10 @@ class HumanPlayer(BasePokerPlayer):
         print("\n回合结束。胜利者：", winners)
         print("本局详细信息：", hand_info)
 
-
-class NormPlayer(BasePokerPlayer):
+class ServerPlayer(BasePokerPlayer):
 
     def declare_action(self, valid_actions, hole_card, round_state):
-        return "fold", 0
+        return ask_action(self.name,valid_actions)
 
     def receive_game_start_message(self, game_info):
         pass
@@ -190,7 +189,29 @@ def start_game(con):
         if i == 0:
             player_i = HumanPlayer(table, name)
         else:
-            player_i = NormPlayer(table, name)
+            player_i = ServerPlayer(table, name)
+        table.player.append(player_i)
+        table.names.append(name)
+        config.register_player(name=name, algorithm=player_i)
+
+    # 开始游戏
+    game_result = start_poker(config, verbose=1)
+
+
+
+if __name__ == "__main__":
+
+    config = setup_config(**con)
+
+    #注册桌子
+    table = Table(player_amount, initial_stack)
+    # 注册玩家
+    for i in range(player_amount):
+        name = f"player_{i}"
+        if i == 0:
+            player_i = HumanPlayer(table, name)
+        else:
+            player_i = ServerPlayer(table, name)
         table.player.append(player_i)
         table.names.append(name)
         config.register_player(name=name, algorithm=player_i)
@@ -204,12 +225,3 @@ def start_game(con):
 
     winner = max(game_result['players'], key=lambda x: x['stack'])
     print(f"\n获胜者是 {winner['name']}，剩余筹码 {winner['stack']}")
-
-
-if __name__ == "__main__":
-    player_amount = 3
-    max_round = 3
-    initial_stack = 100
-    small_blind_amount = 0.5
-    main()
-
